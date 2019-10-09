@@ -20,7 +20,7 @@ int main() { // Main entry point of the shell
     pid_t pid; // variable to store process ID
 
     do {
-        cout << "Heesang's Shell> "; // Show > to waiting for user command input
+        cout << "Heesang's Shell # "; // Show # to waiting for user command input
         fgets(command, sizeof command, stdin);
         // cout << command << endl; // print input command for check
         
