@@ -50,10 +50,12 @@ Assignment 2
 		fork();
 		```
 		
+		![](.\problem3.png)
+		
 		* How many unique processes are created?
-		  *--> Answer: There are total of*
+		  *--> Answer: There are total of 6 unique processes created*
 		* How many unique threads are created?
-		  *--> Answer: There are total of 2 unique thread created* 
+		  *--> Answer: There are total of 2 unique threads created* 
 
 
 4. **(4.19) in Textbook: [0.5p]**
