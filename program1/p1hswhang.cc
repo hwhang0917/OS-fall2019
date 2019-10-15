@@ -22,6 +22,7 @@ int main() { // Main entry point of the shell
     do {
         cout << "Heesang's Shell # "; // Show # to waiting for user command input
         fgets(command, sizeof command, stdin);
+        // cin >> command;
         // cout << command << endl; // print input command for check
         
         /* 
@@ -48,7 +49,6 @@ int main() { // Main entry point of the shell
         switch(pid = fork()) {
             case 0: // Child Process
                 execvp(args[0], args);
-                perror("ERROR: execvp() failed");
                 break;
 
             case -1: // Fork Failed
