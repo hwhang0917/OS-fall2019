@@ -99,7 +99,6 @@ Assignment 2
     
 
 *--> Answer: thread can access shared global variable, so the pthread function changes value within the child process. However, this does not apply to the parent process because processes do not share global variable. Therefore, the out put is the following for each line:* 
-
 ```
 CHILD: value = 5
 PARENT: value = 0
@@ -113,7 +112,7 @@ PARENT: value = 0
      int turn;
      ```
      
-   * The structure of process *Pi (i == 0 or 1)* is shown in Figure 6.18:
+   * The structure of process *Pi (i == 0 or 1)* is shown in Figure 6.18. The other process is *Pj (j == 1 or 0)*.
    
      ```C
      while (true) { 
@@ -136,5 +135,13 @@ PARENT: value = 0
      }
      ```
    
-   * The other process is *Pj (j == 0 or 0)*. Prove that the algorithm satisfies all three requirements for the critical-section problem.
+   * Prove that the algorithm satisfies all three requirements for the critical-section problem.
 
+*--> Answer:*
+
+* *Mutual Exclusion is satisfied*
+    *Assume both Pi and Pj flag are set to true, both trying to enter a critical section. The variable turn will stop one of the process of entering the critical section by waiting within while(turn==j) loop doing nothing. Until the turn is switched by the original process exiting the critical section. Allowing mutual exclusion.*
+* *Progress is satisfied*
+    *With the help of the turn variable, both process Pi and Pj takes turn to enter the critical section striving for process. Also the flag is being set to true every loop towards process instead, so there are always a function that is entering critical section*
+* *Bounded waiting is satisfied*
+    *Instead of indefinite bound, the turn variable simply switches on and off allowing the waiting process to have chance to enter the critical section after the other process in critical section exits out from it.*
