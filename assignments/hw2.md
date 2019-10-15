@@ -60,42 +60,46 @@ Assignment 2
 
 4. **(4.19) in Textbook: [0.5p]**
 
-	* The program shown in Figure 4.23 that uses the Pthreads API. 
-	
-	```c
-	#include <pthread.h>
-	#include <stdio.h>
-	
-	int value = 0;
-	void *runner(void *param); /* the thread */
-	
-	int main(int argc, char *argv[])
-	{
-	pid_t pid;
-	pthread_t tid;
-	pthread_arrt_t attr;
-	    
-	    pid = fork();
-	
-	    if (pid == 0) { /* Child process */
-	        pthread_attr_init(&attr);
-	        pthread_create(&tid,&attr,runner,NULL);
-	        pthread_join(tid,NULL);
-	        printf("CHILD: value = %d", value); /* LINE C */
-	    }
-	    else if (pid > 0) { /* Parent proces */
-	    	wait(NULL);
-	        printf("PARENT: value = %d", value); /* LINE P */
-	    }
-	}
-	
-	void *runner(void *param) {
-	    value = 5;
-	    pthread_exit(0);
-	}
-	```
-	
-	* What would be the output from the program at *LINE C* and *LINE P*?
+  * The program shown in Figure 4.23 that uses the Pthreads API. 
+
+  ```c
+  #include <pthread.h>
+  #include <stdio.h>
+  
+  int value = 0;
+  void *runner(void *param); /* the thread */
+  
+  int main(int argc, char *argv[])
+  {
+  pid_t pid;
+  pthread_t tid;
+  pthread_arrt_t attr;
+      
+      pid = fork();
+  
+      if (pid == 0) { /* Child process */
+          pthread_attr_init(&attr);
+          pthread_create(&tid,&attr,runner,NULL);
+          pthread_join(tid,NULL);
+          printf("CHILD: value = %d", value); /* LINE C */
+      }
+      else if (pid > 0) { /* Parent proces */
+      	wait(NULL);
+          printf("PARENT: value = %d", value); /* LINE P */
+      }
+  }
+  
+  void *runner(void *param) {
+      value = 5;
+      pthread_exit(0);
+  }
+  ```
+
+  * What would be the output from the program at *LINE C* and *LINE P*?
+    *--> Answer: thread can access shared global variable, so the pthread function changes value within the child process. However, this does not apply to the parent process because processes do not share global variable. Therefore, the out put is the following for each line:* 
+
+    *CHILD: value = 5*
+    *PARENT: value = 0*
 
 5. **(6.13) in Textbook: [2.0p]**
 
