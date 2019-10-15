@@ -19,13 +19,19 @@ Assignment 2
 
 2. **(4.15) in Textbook: [1.0p]**
 * Determine if the following cases exhibit task or data parallelism
-		* Using a separate thread to generate a thumbnail for each photo in a collection
-		* Transposing a matrix in parallel
-		* A networked application where one thread reads from the network and another writes to the network
-		* The fork-join array summation application described in Section 4.5.2.
-		* The Grand Central Dispatch System  
+		* CASE 1: Using a separate thread to generate a thumbnail for each photo in a collection
+	* CASE 2: Transposing a matrix in parallel
+	* CASE 3: A networked application where one thread reads from the network and another writes to the network
+	* CASE 4: The fork-join array summation application described in Section 4.5.2.
+	* CASE 5: The Grand Central Dispatch System  
+	
 
-*-->* 
+*--> Answer:*
+	*case 1: exhibits data parallelism, using the same photo data to simulate multiple thumbnails across multiple cores*
+	*case 2: exhibits exhibits data parallelism, using the entire matrix data to compute single operations on each thread to transpose the matrix*
+	*case 3: exhibits task parallelism, where two threads are performing unique operations within the network application*
+	*case4: exhibits task parallelism, where multiple process are creating another process to perform join operation*
+	*case5: exhibits task parallelism where multi-core system optimizes the system by granting thread management task to the kernel*
 
 
 
@@ -45,9 +51,9 @@ Assignment 2
 		```
 		
 		* How many unique processes are created?
-		  *-->*
+		  *--> Answer: There are total of*
 		* How many unique threads are created?
-		  *-->* 
+		  *--> Answer: There are total of 2 unique thread created* 
 
 
 4. **(4.19) in Textbook: [0.5p]**
