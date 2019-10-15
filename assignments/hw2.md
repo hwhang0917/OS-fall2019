@@ -96,8 +96,9 @@ Assignment 2
   ```
 
   * What would be the output from the program at *LINE C* and *LINE P*?
-    *--> Answer: thread can access shared global variable, so the pthread function changes value within the child process. However, this does not apply to the parent process because processes do not share global variable. Therefore, the out put is the following for each line:* 
-
+    
+*--> Answer: thread can access shared global variable, so the pthread function changes value within the child process. However, this does not apply to the parent process because processes do not share global variable. Therefore, the out put is the following for each line:* 
+    
     *CHILD: value = 5*
     *PARENT: value = 0*
 
