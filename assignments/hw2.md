@@ -50,7 +50,7 @@ Assignment 2
 		fork();
 		```
 		
-		![](.\problem3.png)
+		![](./problem3.png)
 		
 		* How many unique processes are created?
 		  *--> Answer: There are total of 6 unique processes created*
