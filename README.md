@@ -13,7 +13,7 @@
 
 ### Note
 
-In order to compile project with *pthreads()*, another argument has to be passed onto GNU compiler, example code below:
+In order to compile project with *pthread()*, another argument has to be passed onto GNU compiler, example code below:
 
 ```sh
 g++ p2hswhang.cpp -pthread -o project2
