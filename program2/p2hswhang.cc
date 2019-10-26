@@ -1,137 +1,148 @@
-
-// CPP Program to implement merge sort using
-// multi-threading
 #include <iostream>
+#include <fstream>
+#include <typeinfo>
 #include <pthread.h>
-#include <time.h>
-
-// number of elements in array
-#define MAX 20
-
-// number of threads
-#define THREAD_MAX 4
 
 using namespace std;
 
-// array of size MAX
-int a[MAX];
-int part = 0;
+// Maximum number of integers in the list
+#define MAX 20
 
-// merge function for merging two parts
-void merge(int low, int mid, int high)
-{
-    int* left = new int[mid - low + 1];
-    int* right = new int[high - mid];
+int unsorted[MAX-1]; // Global array that is shared between two sorting threads
+                // each thread will work on half of the array
 
-    // n1 is size of left part and n2 is size
-    // of right part
-    int n1 = mid - low + 1, n2 = high - mid, i, j;
+int sorted[MAX-1]; // Global array that is shared between two sorting threads
+                // to store their own sorted subarrays here
 
-    // storing values in left part
-    for (i = 0; i < n1; i++)
-        left[i] = a[i + low];
+typedef int int_type;
 
-    // storing values in right part
-    for (i = 0; i < n2; i++)
-        right[i] = a[i + mid + 1];
+// ================ UTILITY FUNCTIONS ================
+int readData() {
+  // Function to read data from "p2data.txt"
+  // Check if there are even number of integers in the file & does not exceed MAX
+  // Returns:
+  //        number of integers if suceeds
+  //        -1 if there is an error
+  ifstream file("p2data.txt"); // filename "p2data.txt" is hard coded & open file
+  int num, element_count = 0, index = 0;
 
-    int k = low;
-    i = j = 0;
-
-    // merge left and right in ascending order
-    while (i < n1 && j < n2) {
-        if (left[i] <= right[j])
-            a[k++] = left[i++];
-        else
-            a[k++] = right[j++];
+  if (file.is_open()) {
+    while (file >> num) {
+      if (typeid(num) != typeid(int_type)) { // data type check
+        cout << "ERROR [INVALID DATA TYPE]: Only integers should be stored in p2data.txt!!" << endl;
+        return -1;
+      }
+      if(MAX <= element_count++) { // MAX count check
+        cout << "* Note: Maximum of 20 elements or less is assumed in the assignment. " << endl;
+        cout << "ERROR [ARRAY OVERFLOW]: There cannot be more than 20 elements!!" << endl;
+        return -1;
+      }
+      unsorted[index++] = num; // populate global unsorted with integers from p2data.txt
     }
+  } else { // file open check
+    cout << "ERROR [FILE OPEN FAIL]: file p2data.txt failed to open!!" << endl;
+    return -1;
+  }
 
-    // insert remaining values from left
-    while (i < n1) {
-        a[k++] = left[i++];
-    }
+  if (element_count % 2 != 0) { // Even number of element check
+    cout << "* Note: even number of element is assumed in the assignment." << endl;
+    cout << "ERROR [ELEMENT COUNT ODD]: file contains odd number of elements!!" << endl;
+    return -1;
+  }
 
-    // insert remaining values from right
-    while (j < n2) {
-        a[k++] = right[j++];
-    }
+  return element_count; // successfully read all integers from p2data.txt
 }
 
-// merge sort function
-void merge_sort(int low, int high)
-{
-    // calculating mid point of array
-    int mid = low + (high - low) / 2;
-    if (low < high) {
+// ================ PTHREAD MERGE / SORT FUNCTIONS ================
+void* sort(void *rangePtr) {
+  // Sort half of the array with given range array
+  // Paramter:
+  //          rangePtr (pointer to array of rangeA)
+  cout << "~~~~~ SORT THREAD START" << endl;
+  int *range = (int *) rangePtr; // Retrieve range array
+  int min_idx; // minimum index
 
-        // calling first half
-        merge_sort(low, mid);
+  // DO SELECTION SORT
+  for (int i = range[0]; i < range[1]; i++) { // Iterate through range
+    min_idx = i;
+    // cout << "THREAD from range[" << range[0] << "]: min:" << min_idx << endl;
+    for (int j = i + 1; j < range[1]; j++)
+      if (unsorted[j] < unsorted[min_idx]) min_idx = j;
 
-        // calling second half
-        merge_sort(mid + 1, high);
-
-        // merging the two halves
-        merge(low, mid, high);
-    }
+    swap(unsorted[min_idx], unsorted[i]); // swap until sorted
+  }
+  cout << "***** SORT THREAD END" << endl;
 }
 
-// thread function for multi-threading
-void* merge_sort(void* arg)
-{
-    // which part out of 4 parts
-    int thread_part = part++;
+void* merge(void *sizePtr) {
+  int size = (*(int*) sizePtr);
+  int min_idx;
+  cout << "~~~~~ MERGE THREAD START" << endl;
+  // DO SELECTION SORT
+  for (int i = 0; i < size; i++) { // Iterate through range
+    min_idx = i;
 
-    // calculating low and high
-    int low = thread_part * (MAX / 4);
-    int high = (thread_part + 1) * (MAX / 4) - 1;
+    for (int j = i + 1; j < size; j++)
+      if (unsorted[j] < unsorted[min_idx]) min_idx = j;
 
-    // evaluating mid point
-    int mid = low + (high - low) / 2;
-    if (low < high) {
-        merge_sort(low, mid);
-        merge_sort(mid + 1, high);
-        merge(low, mid, high);
-    }
+    swap(unsorted[min_idx], unsorted[i]); // swap until sorted
+  }
+
+  for (int i = 0; i < size; i++) // copy sorted array
+    sorted[i] = unsorted[i];
+  cout << "***** MERGE THREAD END" << endl;
 }
 
-// Driver Code
-int main()
-{
-    // generating random values in array
-    for (int i = 0; i < MAX; i++)
-        a[i] = rand() % 100;
+int main() {
+  int size = readData();
+  if (size == -1) return 0; // Error exit
 
-    // t1 and t2 for calculating time for
-    // merge sort
-    clock_t t1, t2;
+  cout << ":::::::::::::::::::UNSORTED::::::::::::::::" << endl;
+  cout << "Array Size: " << size << endl;
+  for (int i = 0; i < size; i++)
+    cout << unsorted[i] << " ";
+  cout << endl;
+  cout << ":::::::::::::::::::::::::::::::::::::::::::" << endl;
 
-    t1 = clock();
-    pthread_t threads[THREAD_MAX];
+  pthread_t sortThreadA, sortThreadB, mergeThread; // Three thread initialize
+  int rangeA[2] = {0, ((size/2))};
+  int rangeB[2] = {(size / 2), size};
 
-    // creating 4 threads
-    for (int i = 0; i < THREAD_MAX; i++)
-        pthread_create(&threads[i], NULL, merge_sort,
-                                        (void*)NULL);
+  cout << "Range of Sort A thread: [" << rangeA[0] << "] ~ [" << rangeA[1] << "]" << endl;
+  cout << "Range of Sort B thread: [" << rangeB[0] << "] ~ [" << rangeB[1] << "]" << endl;
+  cout << endl << endl;
 
-    // joining all 4 threads
-    for (int i = 0; i < 4; i++)
-        pthread_join(threads[i], NULL);
+  // Create two sorting arrays
+  pthread_create(&sortThreadA, NULL, sort, (void*)rangeA);
+  pthread_create(&sortThreadB, NULL, sort, (void*)rangeB);
 
-    // merging the final 4 parts
-    merge(0, (MAX / 2 - 1) / 2, MAX / 2 - 1);
-    merge(MAX / 2, MAX/2 + (MAX-1-MAX/2)/2, MAX - 1);
-    merge(0, (MAX - 1)/2, MAX - 1);
+  // main thread waits for sorting threads finishes
+  pthread_join(sortThreadA, NULL);
+  pthread_join(sortThreadB, NULL);
 
-    t2 = clock();
+  cout << endl << endl;
+  // Print half sorted array
+  cout << "::::::::::::::::HALF SORTED::::::::::::::::" << endl;
+  cout << "Array Size: " << size << endl;
+  for (int i = 0; i < size; i++) {
+    if (i == (size/2))  cout << " || ";
+    cout << unsorted[i] << " ";
+  }
+  cout << endl;
+  cout << ":::::::::::::::::::::::::::::::::::::::::::" << endl;
 
-    // displaying sorted array
-    cout << "Sorted array: ";
-    for (int i = 0; i < MAX; i++)
-        cout << a[i] << " ";
+  // When sorting threads are done, main thread create merging thread
+  pthread_create(&mergeThread, NULL, merge, (void*)&size);
+  pthread_join(mergeThread, NULL); // waits for merge to finish
+  cout << endl << endl;
 
-    // time taken by merge sort in seconds
-    cout << "Time taken: " << (t2 - t1) /
-              (double)CLOCKS_PER_SEC << endl;
+  // Print sorted array
+  cout << "::::::::::::::::::::SORTED:::::::::::::::::" << endl;
+  cout << "Array Size: " << size << endl;
+  for (int i = 0; i < size; i++)
+    cout << sorted[i] << " ";
+  cout << endl;
+  cout << ":::::::::::::::::::::::::::::::::::::::::::" << endl;
 
-    return 0;
+  return 0;
 }
