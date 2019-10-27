@@ -32,17 +32,12 @@ pop() {
 * A) For problem a, show a scenario to demonstrate how a race condition can occur.
 
 *Answer:--------------------------------------*
-*Assume initial top value was 5, and given item parameter was "X"*
+*Assume initial top value was 5, and given item parameter was "item6"*
 
-*T0: push() execute resgister1 = top; 			(register1 = 5)*
-*T1: push() execute register1 = register1 + 1;    (register1 = 6)*
-*T2: pop() execute register2 = top; 				(register2 = 5)*
-*T3: pop() execute register2 = register2 -1; 	 (register2 = 4)*
-*T4: push() execute top = register1; 			(top = 6)*
-*T5: pop() execute top = register2; 				(top = 4)*
+![](C:\Users\hwhan\Biola Works\Fall 2019\OS-fall2019\assignments\hw3_prob1.png)
 
 *with push() and pop() running concurrently, could cause race condition as above*
-*pop() would return stack[4], while push() puts item at stack[6]*
+*pop() would return stack[4], while push() increments next top index at stack[6]*
 
 * B) For problem b, copy functions push(), pop(), and is_empty() and then add your solution to them. 
   **Hint:** what happens if push() and pop() are executed concurrently?
@@ -90,25 +85,21 @@ void bid(double amount) {
   **Hint:** What happens if two bidders place two bids higher than the current highest bid at the same time?
 *Answer:--------------------------------------*
 *Possible Race Condition:*
-  *Assume bidder A bid 100, and bidder B bid 98, and the current highest bid is 90:*
-  *T0: bidA enters if condition (100 > 90)[TRUE]*
-  *T1: bidB enters if condition (98 > 90)[TRUE]*
-  *T2: bidA executes highestBid = 100*
-  *T3: bidB executed highestBid = 98*
   
-  // Race condition where 98 become highest bid while bidderA bid 100
-  *--------------------------------------*
+  ![](C:\Users\hwhan\Biola Works\Fall 2019\OS-fall2019\assignments\hw3_prob2.png)
   
-  To solve this:
-  
+  // Race condition where 98 become highest bid while  bid(100)
+  *To solve this:*
 ```C++
 void bid(double amount) {
+    mutex_lock lock; // Utilize mutex lock to prevent concurrent access to the CS
+    
+    lock.acquire();
     if (amount > highestBid)
-        highestBid = amount;
+        highestBid = amount; // Critical Section
+    lock.release();
 }
 ```
-
-  
 
 
 3. **(6.12) in Textbook [1.0 p]**
@@ -125,6 +116,16 @@ if (getValue(&sem) > 0)
   * The lock is to be held for a short duration
   * The lock is to be held for a long duration
   * A thread may be put to sleep while holding the lock.
+
+  
+  *Answer:--------------------------------------*
+  
+  *[1] **Spinlock** would fit the first scenario because it locks threads for the shortest duration*
+  
+  *[2] **Mutex lock** would be the best for the second scenario because mutex lock can hold long term wait*
+  
+  *[3] **Mutex lock** would fit the third scenario because it allows threads to go to sleep*
+
 5. **(6.24) in Textbook [1.0 p]**
 * In Section 6.7, we use the following illustration as an incorrect use of semaphores to solve the critical-section problem:
   
@@ -137,3 +138,7 @@ wait(mutex);
 ```
 
 * Explain why this is an example of a liveness failure.
+
+*Answer:--------------------------------------*
+
+*As the process enters the critical section, the second call to wait() is permanently blocked without signal() resulting in an liveness failure of deadlock*
