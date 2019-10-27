@@ -34,7 +34,7 @@ pop() {
 *Answer:--------------------------------------*
 *Assume initial top value was 5, and given item parameter was "item6"*
 
-![](.\hw3_prob1.png)
+![](./hw3_prob1.png)
 
 *with push() and pop() running concurrently, could cause race condition as above*
 *pop() would return stack[4], while push() increments next top index at stack[6]*
@@ -94,7 +94,7 @@ void bid(double amount) {
 *Answer:--------------------------------------*
   *Possible Race Condition:*
 
-![](.\hw3_prob2.png)
+![](./hw3_prob2.png)
 
   // Race condition where 98 become highest bid while  bid(100)
   *To solve this:*
