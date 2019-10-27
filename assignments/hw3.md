@@ -9,7 +9,7 @@ Assignment 2
 1. **(6.7) in Textbook: [1.0 p]**
 * The pseudocode of Figure 6.15 illustrate the basic push() and pop() operations of an array-based stack. Assuming that this algorithm could be used in a concurrent environment, answer the following questions:
 
-```pseudocode
+```C++
 push(item) {
     if (top < SIZE) {
         stack[top] = item;
@@ -44,11 +44,13 @@ pop() {
 
 *Answer:--------------------------------------*
 
-```pseudocode
+```C++
 push(item) {
+    wait(S); // Semaphore to busy wait until other process calls signal()
     if (top < SIZE) {
         stack[top] = item;
         top++;
+        signal(Q); // Releae for other process to exit busy wait
     }
     else
         ERROR
@@ -56,15 +58,20 @@ push(item) {
 
 pop() {
     if (!is_empty()) {
+    	wait(Q); // Semaphore to busy wait until other process calls signal()
         top--;
+        signal(S); // Releae for other process to exit busy wait
         return stack[top];
     }
     else
         ERROR
 }
 
-is_empty() {
-
+is_empty() { // Returns true if stack top is -1 (empty)
+	if (top == -1)
+		return true;
+	else
+		return flase;
 }
 ```
 
@@ -83,13 +90,15 @@ void bid(double amount) {
 
 * Show a scenario to demonstrate a race condition can occur. Also, copy function bid() and then add your own solution to it. 
   **Hint:** What happens if two bidders place two bids higher than the current highest bid at the same time?
+
 *Answer:--------------------------------------*
-*Possible Race Condition:*
-  
-  ![](C:\Users\hwhan\Biola Works\Fall 2019\OS-fall2019\assignments\hw3_prob2.png)
-  
+  *Possible Race Condition:*
+
+![](C:\Users\hwhan\Biola Works\Fall 2019\OS-fall2019\assignments\hw3_prob2.png)
+
   // Race condition where 98 become highest bid while  bid(100)
   *To solve this:*
+
 ```C++
 void bid(double amount) {
     mutex_lock lock; // Utilize mutex lock to prevent concurrent access to the CS
@@ -111,20 +120,19 @@ if (getValue(&sem) > 0)
 ```
 * Many developers argue against such a function and discourage its use. Describe a potential problem that could occur when using the function *getValue()* in this scenario.
 
+*Answer:--------------------------------------*
+*Using such implementation (preventing busy waiting by checking semaphore value prior to wait()) can result in an liveness error of priority inversion. For instance when two processes are trying to enter critical section concurrently, both process will enter if(getValue(&sem) > =0) statement, and pass the busy waiting stage. This could result in both process entering the critical section concurrently, which can cause race condition.*
+
 4. **(6.19) in Textbook [1.0 p]**
 * Assume that a system has multiple processing cores. For each of the following scenarios, describe which is a better locking mechanism -- a spinlock or mutex lock where waiting processes sleep while waiting for the lock to become available:
   * The lock is to be held for a short duration
   * The lock is to be held for a long duration
   * A thread may be put to sleep while holding the lock.
 
-  
-  *Answer:--------------------------------------*
-  
-  *[1] **Spinlock** would fit the first scenario because it locks threads for the shortest duration*
-  
-  *[2] **Mutex lock** would be the best for the second scenario because mutex lock can hold long term wait*
-  
-  *[3] **Mutex lock** would fit the third scenario because it allows threads to go to sleep*
+*Answer:--------------------------------------*
+*[1] **Spinlock** would fit the first scenario because it locks threads for the shortest duration*
+*[2] **Mutex lock** would be the best for the second scenario because mutex lock can hold long term wait*
+*[3] **Mutex lock** would fit the third scenario because it allows threads to go to sleep*
 
 5. **(6.24) in Textbook [1.0 p]**
 * In Section 6.7, we use the following illustration as an incorrect use of semaphores to solve the critical-section problem:
@@ -140,5 +148,4 @@ wait(mutex);
 * Explain why this is an example of a liveness failure.
 
 *Answer:--------------------------------------*
-
 *As the process enters the critical section, the second call to wait() is permanently blocked without signal() resulting in an liveness failure of deadlock*
