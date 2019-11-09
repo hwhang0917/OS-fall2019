@@ -96,7 +96,7 @@ void remove_item(int *out_item) {
     pthread_mutex_lock(&cons_mutex); // synchronize the multiple consumer threads
 
     //~~~~~~~~ CRITICAL SECTION
-    out_item = &buffer_pool[out];
+    *out_item = buffer_pool[out];
     out = (out + 1) % MAX_BUFFER_SIZE; // updat ethe out pointer
     //~~~~~~~~~~~~~~~~~~~~~~~~~ END
 
