@@ -31,8 +31,8 @@ int main() {
     empty.count = 10; full.count = 0;
 
     // Initialize Semaphores
-    sem_init(&empty.sem, MAX_BUFFER_SIZE, MAX_BUFFER_SIZE); // empty count is initially 10
-    sem_init(&full.sem, 0, MAX_BUFFER_SIZE); // full count is initially 0
+    sem_init(&empty.sem, empty.count, MAX_BUFFER_SIZE); // empty count is initially 10
+    sem_init(&full.sem, full.count, MAX_BUFFER_SIZE); // full count is initially 0
     pthread_mutex_init(&prod_mutex, NULL);
     pthread_mutex_init(&cons_mutex, NULL);
     pthread_t tid_producer[MAX_THREAD_NUMBER], tid_consumer[MAX_THREAD_NUMBER];
