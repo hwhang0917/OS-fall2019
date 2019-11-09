@@ -10,6 +10,7 @@
 - Written Assignments
 
   - [Assignment #2](./assignments/hw2.md)
+  - [Assignment #3](./assignments/hw3.md)
 
 ### Note
 
