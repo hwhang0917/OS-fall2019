@@ -5,7 +5,7 @@
 #include <semaphore.h>
 
 #define MAX_BUFFER_SIZE 10
-#define MAX_THREAD_NUMBER 20
+#define MAX_THREAD_NUMBER 10
 
 void *consumer(void *param);
 void *producer(void *param);
@@ -43,9 +43,9 @@ int main() {
         std::cout << "Enter the number of producer threads: "; std::cin >> prod_num;
         std::cout << "Enter the number of consumer threads: "; std::cin >> cons_num;
 
-        // Maximum of 20 threads can be created
+        // Maximum of 10 threads can be created
         if (prod_num > MAX_THREAD_NUMBER || cons_num > MAX_THREAD_NUMBER)
-            std::cout << "ERROR: Try entering limited thread number (<20)" << std::endl;
+            std::cout << "ERROR: Try entering limited thread number (<10)" << std::endl;
 
     } while (prod_num > MAX_THREAD_NUMBER || cons_num > MAX_THREAD_NUMBER);
 
@@ -59,6 +59,7 @@ int main() {
 
     sleep(sleep_sec); // Sleep main thread for input seconds
 
+    // MAIN THREAD DOES NOT WAIT FOR CHILD THREADS (infinite loop in child threads)
     // // Joining Threads
     // for (int i = 0; i < prod_num; i++) { // Wait number of producer threads
     //     pthread_join(tid_producer[i], NULL);
@@ -67,11 +68,11 @@ int main() {
     //     pthread_join(tid_consumer[i], NULL);
     // }
 
-    // // Destroy semaphores and mutexes
-    // pthread_mutex_destroy(&prod_mutex);
-    // pthread_mutex_destroy(&cons_mutex);
-    // sem_destroy(&empty.sem);
-    // sem_destroy(&full.sem);
+    // Destroy semaphores and mutexes
+    pthread_mutex_destroy(&prod_mutex);
+    pthread_mutex_destroy(&cons_mutex);
+    sem_destroy(&empty.sem);
+    sem_destroy(&full.sem);
 
     std::cout << "Main thread finish" << std::endl;
 
