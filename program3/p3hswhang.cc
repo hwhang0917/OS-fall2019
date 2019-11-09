@@ -101,29 +101,33 @@ void remove_item(int *out_item) {
     out = (out + 1) % MAX_BUFFER_SIZE; // updat ethe out pointer
     //~~~~~~~~~~~~~~~~~~~~~~~~~ END
 
-    pthread_mutex_unlock(&cons_mutex); // synchronize the multiple producer threads
+    pthread_mutex_unlock(&cons_mutex); // synchronize the multiple consumer threads
     sem_post(&empty.sem); // notify the producer threads
 }
 
 void *producer (void *param) {
-    int item;
+    int item, buffer_number;
     pthread_t tid = pthread_self();
 
     while (true) {
         sleep(rand() % 3); // generate a random number for the producer thread to sleep
         item = rand() % 20; // generate a random number representing an item to be deposited
         insert_item(item); // semaphores and mutex are implemented in the function
-        std::cout << "producer " << tid << " produced " << item << " in buffer " << in << std::endl;
+        if (in == 0) buffer_number = 9;
+        else buffer_number = in - 1;
+        std::cout << "producer " << tid << " produced " << item << " in buffer " << buffer_number << std::endl;
     }
 }
 
 void *consumer(void *param) {
-    int item;
+    int item, buffer_number;
     pthread_t tid = pthread_self();
 
     while(true) {
         sleep(rand() % 3); // generate a random number for the producer thread to sleep
         remove_item(&item); // semaphores and mutex are implemented in the function
-        std::cout << "consumer " << tid << " consumed " << item << " from buffer " << out << std::endl;
+        if (out == 0) buffer_number = 9;
+        else buffer_number = out - 1;
+        std::cout << "consumer " << tid << " consumed " << item << " from buffer " << buffer_number << std::endl;
     }
 }
